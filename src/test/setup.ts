@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
-import { server } from './mocks/server.js';
+import 'whatwg-fetch'; // Needed so `fetch` can be properly used in our tests
+import server from './mocks/server';
 
 vi.stubGlobal('alert', vi.fn());
 
