@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 import { setup } from './test/utils';
 import server from './test/mocks/server';
@@ -6,7 +6,7 @@ import { DISCOGS_BASE_URL } from './services/api';
 import App from './App';
 
 describe('<App />', () => {
-  test('can search for an artist', async () => {
+  test('can search for an artist and see their releases', async () => {
     server.use(
       rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
         res(
@@ -21,6 +21,26 @@ describe('<App />', () => {
             ],
           })
         )
+      ),
+      rest.get(
+        `${DISCOGS_BASE_URL}/artists/:artistId/releases`,
+        (req, res, ctx) =>
+          res(
+            ctx.json({
+              pagination: {
+                items: 10,
+                page: 1,
+                pages: 2,
+              },
+              releases: [
+                { id: 1, thumb: '', title: 'Release 1' },
+                { id: 2, thumb: '', title: 'Release 2' },
+                { id: 3, thumb: '', title: 'Release 3' },
+                { id: 4, thumb: '', title: 'Release 4' },
+                { id: 5, thumb: '', title: 'Release 5' },
+              ],
+            })
+          )
       )
     );
 
@@ -29,6 +49,41 @@ describe('<App />', () => {
     const searchBar = screen.getByLabelText(/search/i);
     await user.type(searchBar, 'ghost{Enter}');
     await screen.findByRole('img', { name: 'Ghost' });
+
+    // Initial set of releases
+    const releases = await screen.findByTestId('releases');
+    expect(within(releases).getAllByRole('img')).toHaveLength(5);
+
+    server.use(
+      rest.get(
+        `${DISCOGS_BASE_URL}/artists/:artistId/releases`,
+        (req, res, ctx) =>
+          res(
+            ctx.json({
+              pagination: {
+                items: 10,
+                page: 2,
+                pages: 2,
+              },
+              releases: [
+                { id: 6, thumb: '', title: 'Release 6' },
+                { id: 7, thumb: '', title: 'Release 7' },
+                { id: 8, thumb: '', title: 'Release 8' },
+                { id: 9, thumb: '', title: 'Release 9' },
+                { id: 10, thumb: '', title: 'Release 10' },
+              ],
+            })
+          )
+      )
+    );
+
+    // After clicking on "Load more"
+    const loadMoreButton = screen.getByRole('button', { name: /load more/i });
+    await user.click(loadMoreButton);
+    await waitFor(() => {
+      expect(within(releases).getAllByRole('img')).toHaveLength(10);
+    });
+    expect(loadMoreButton).not.toBeInTheDocument();
   });
 
   test('shows a message when an artist could not be found', async () => {
