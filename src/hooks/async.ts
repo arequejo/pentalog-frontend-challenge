@@ -25,7 +25,8 @@ export default function useAsync<TData = unknown, TError = Error>(
   isError: boolean;
   data: TData | undefined;
   error: TError | undefined;
-  run: (promise: Promise<TData>) => Promise<void>;
+  run: (promise: Promise<TData>) => Promise<TData | TError>;
+  reset: () => void;
 } {
   const initialStateRef = React.useRef<State<TData, TError>>({
     ...{
@@ -51,15 +52,21 @@ export default function useAsync<TData = unknown, TError = Error>(
     (promise: Promise<TData>) => {
       dispatch({ status: 'loading', data: undefined, error: undefined });
       return promise
-        .then((data: TData) =>
-          dispatch({ status: 'success', data, error: undefined })
-        )
-        .catch((error: TError) =>
-          dispatch({ status: 'error', error, data: undefined })
-        );
+        .then((data: TData) => {
+          dispatch({ status: 'success', data, error: undefined });
+          return data;
+        })
+        .catch((error: TError) => {
+          dispatch({ status: 'error', error, data: undefined });
+          return error;
+        });
     },
     [dispatch]
   );
+
+  const reset = React.useCallback(() => {
+    dispatch(initialStateRef.current);
+  }, []);
 
   return {
     status,
@@ -70,5 +77,6 @@ export default function useAsync<TData = unknown, TError = Error>(
     data,
     error,
     run,
+    reset,
   };
 }
