@@ -48,9 +48,15 @@ describe('<App />', () => {
 
     const searchBar = screen.getByLabelText(/search/i);
     await user.type(searchBar, 'ghost{Enter}');
+
+    // Check that the term was added to history
+    screen.getByRole('button', { name: 'ghost' });
+    screen.getByRole('button', { name: /remove ghost from history/i });
+
+    // Check for artit's cover image
     await screen.findByRole('img', { name: 'Ghost' });
 
-    // Initial set of releases
+    // Check initial set of releases
     const releases = await screen.findByTestId('releases');
     expect(within(releases).getAllByRole('img')).toHaveLength(5);
 
@@ -77,7 +83,7 @@ describe('<App />', () => {
       )
     );
 
-    // After clicking on "Load more"
+    // ...now after clicking on "Load more"
     const loadMoreButton = screen.getByRole('button', { name: /load more/i });
     await user.click(loadMoreButton);
     await waitFor(() => {

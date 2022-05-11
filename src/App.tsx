@@ -54,7 +54,10 @@ export default function App() {
   return (
     <div className="grid grid-cols-[1fr_minmax(900px,_1fr)_1fr]">
       <div className="col-start-2 col-end-3">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar
+          isSearching={artistQuery.isLoading}
+          onSearch={handleSearch}
+        />
         {(artistQuery.isLoading ||
           artistQuery.isError ||
           (artistQuery.isSuccess && !artistQuery.data)) && (
