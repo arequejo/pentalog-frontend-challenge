@@ -111,7 +111,7 @@ export default function App() {
                 releasesQuery.data.pagination.page <
                   releasesQuery.data.pagination.pages && (
                   <button
-                    className="px-4 py-2 bg-slate-900 text-white rounded focus:outline focus:outline-2 focus:outline-offset-2"
+                    className="px-4 py-2 bg-slate-900 text-white rounded focus:outline focus:outline-2 focus:outline-offset-2 transition-transform hover:-translate-y-1"
                     onClick={() =>
                       loadReleases(
                         artistQuery.data!.id,
