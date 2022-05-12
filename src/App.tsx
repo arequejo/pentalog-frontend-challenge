@@ -52,7 +52,7 @@ export default function App() {
   }
 
   return (
-    <div className="grid grid-cols-[1fr_minmax(900px,_1fr)_1fr]">
+    <div className="grid grid-cols-[1fr_minmax(auto,_900px)_1fr]">
       <div className="col-start-2 col-end-3 text-center">
         <header>
           <h1 className="text-3xl">Pentalog Frontend Challenge</h1>

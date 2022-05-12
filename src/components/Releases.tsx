@@ -11,19 +11,22 @@ export default function Releases({
   children,
 }: React.PropsWithChildren<ReleasesProps>) {
   return (
-    <div className="mt-8 space-y-8">
+    <>
       <div>
         <h2 className="text-2xl">Releases</h2>
         <p className="text-slate-500 italic">Ordered by most recent</p>
       </div>
 
-      <div className="grid grid-cols-5 gap-4" data-testid="releases">
+      <div
+        className="grid grid-cols-[repeat(auto-fit,_minmax(min-content,_150px))] gap-8 justify-center"
+        data-testid="releases"
+      >
         {releases.map((release) => (
           <Release key={release.id} release={release} />
         ))}
       </div>
 
       {children}
-    </div>
+    </>
   );
 }
