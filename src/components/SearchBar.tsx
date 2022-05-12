@@ -35,7 +35,7 @@ export default function SearchBar({ isSearching, onSearch }: SearchBarProps) {
           name="search"
           type="text"
           placeholder="Daft Punk, Ghost, etc."
-          className="block w-full rounded text-2xl p-4 shadow mt-4 border-2 border-black bg-white focus:outline focus:outline-2 focus:outline-offset-2"
+          className="block w-full rounded text-2xl p-4 shadow mt-4 border-2 border-slate-900 bg-white focus:outline focus:outline-2 focus:outline-offset-2"
           value={term}
           onChange={(event) => setTerm(event.target.value)}
         />
@@ -43,9 +43,9 @@ export default function SearchBar({ isSearching, onSearch }: SearchBarProps) {
 
       <div className="flex flex-wrap gap-4 mt-4">
         {history.map((searchedTerm) => (
-          <span key={searchedTerm} className="border border-black rounded">
+          <span key={searchedTerm}>
             <button
-              className="px-2 py-1 bg-black text-white rounded-tl rounded-bl focus:outline focus:outline-2 focus:outline-offset-2"
+              className="px-2 py-1 border-2 border-slate-900 bg-slate-900 text-white rounded-tl rounded-bl focus:outline focus:outline-2 focus:outline-offset-2"
               onClick={() => {
                 setTerm(searchedTerm);
                 onSearch(searchedTerm);
@@ -56,7 +56,7 @@ export default function SearchBar({ isSearching, onSearch }: SearchBarProps) {
 
             <button
               aria-label={`Remove ${searchedTerm} from history`}
-              className="px-2 py-1 bg-white text-black rounded-tr rounded-br focus:outline focus:outline-2 focus:outline-offset-2"
+              className="px-2 py-1 border-2 border-slate-900 bg-white rounded-tr rounded-br focus:outline focus:outline-2 focus:outline-offset-2"
               onClick={() => {
                 setHistory((prevHistory) =>
                   prevHistory.filter(
