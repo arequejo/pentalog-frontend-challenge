@@ -92,6 +92,83 @@ describe('<App />', () => {
     expect(loadMoreButton).not.toBeInTheDocument();
   });
 
+  test('can search by the history buttons', async () => {
+    server.use(
+      rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
+        res(
+          ctx.json({
+            results: [
+              {
+                id: 1,
+                cover_image: 'https://example.com/cover.jpg',
+                title: 'Ghost',
+                type: 'artist',
+              },
+            ],
+          })
+        )
+      )
+    );
+
+    const { user } = setup(<App />);
+
+    const searchBar = screen.getByLabelText(/search/i);
+
+    // First artist
+    await user.type(searchBar, 'ghost{Enter}');
+    await screen.findByRole('img', { name: 'Ghost' });
+
+    server.use(
+      rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
+        res(
+          ctx.json({
+            results: [
+              {
+                id: 1,
+                cover_image: 'https://example.com/cover.jpg',
+                title: 'Iron Maiden',
+                type: 'artist',
+              },
+            ],
+          })
+        )
+      )
+    );
+
+    // Second artist
+    await user.clear(searchBar);
+    await user.type(searchBar, 'iron maiden{Enter}');
+    await screen.findByRole('img', { name: 'Iron Maiden' });
+
+    // Check history and click on first artist
+    expect(screen.getAllByRole('button')).toHaveLength(4); // 2 buttons per history item
+
+    server.use(
+      rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
+        res(
+          ctx.json({
+            results: [
+              {
+                id: 1,
+                cover_image: 'https://example.com/cover.jpg',
+                title: 'Ghost',
+                type: 'artist',
+              },
+            ],
+          })
+        )
+      )
+    );
+
+    await user.click(screen.getByRole('button', { name: 'ghost' }));
+    expect(searchBar).toHaveValue('ghost');
+    await screen.findByRole('img', { name: 'Ghost' });
+    await user.click(
+      screen.getByRole('button', { name: /remove iron maiden from history/i })
+    );
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+  });
+
   test('shows a message when an artist could not be found', async () => {
     server.use(
       rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
@@ -105,6 +182,27 @@ describe('<App />', () => {
     await user.type(searchBar, 'ghost{Enter}');
 
     await screen.findByText(/no artist found/i);
+    expect(
+      screen.queryByRole('heading', { name: /releases/i })
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows a message when an error happens while searching for an artist', async () => {
+    server.use(
+      rest.get(`${DISCOGS_BASE_URL}/database/search`, (req, res, ctx) =>
+        res.networkError('Error')
+      )
+    );
+
+    const { user } = setup(<App />);
+
+    const searchBar = screen.getByLabelText(/search/i);
+    await user.type(searchBar, 'ghost{Enter}');
+
+    await screen.findByText(/something went wrong/i);
+    expect(
+      screen.queryByRole('heading', { name: /releases/i })
+    ).not.toBeInTheDocument();
   });
 
   test('does not search for an artist if the term is empty', async () => {
@@ -116,5 +214,33 @@ describe('<App />', () => {
     await user.type(searchBar, '{Enter}');
 
     expect(screen.queryByText(/searching/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /releases/i })
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows a message when no releases are found', async () => {
+    const { user } = setup(<App />);
+
+    const searchBar = screen.getByLabelText(/search/i);
+    await user.type(searchBar, 'ghost{Enter}');
+
+    await screen.findByText(/no releases found/i);
+  });
+
+  test('shows a message when an error happens while fetching releases', async () => {
+    server.use(
+      rest.get(
+        `${DISCOGS_BASE_URL}/artists/:artistId/releases`,
+        (req, res, ctx) => res.networkError('Error')
+      )
+    );
+
+    const { user } = setup(<App />);
+
+    const searchBar = screen.getByLabelText(/search/i);
+    await user.type(searchBar, 'ghost{Enter}');
+
+    await screen.findByText(/something went wrong/i);
   });
 });
