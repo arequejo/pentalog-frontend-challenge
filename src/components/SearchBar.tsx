@@ -34,7 +34,7 @@ export default function SearchBar({ isSearching, onSearch }: SearchBarProps) {
           id="search"
           name="search"
           type="text"
-          placeholder="Daft Punk, Ghost, etc."
+          placeholder="Ghost, Iron Maiden, etc."
           className="block w-full rounded text-2xl p-4 shadow mt-4 border-2 border-slate-900 bg-white focus:outline focus:outline-2 focus:outline-offset-2"
           value={term}
           onChange={(event) => setTerm(event.target.value)}
