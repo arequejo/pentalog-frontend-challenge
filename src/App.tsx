@@ -53,62 +53,78 @@ export default function App() {
 
   return (
     <div className="grid grid-cols-[1fr_minmax(900px,_1fr)_1fr]">
-      <div className="col-start-2 col-end-3 text-center space-y-8">
-        <SearchBar
-          isSearching={artistQuery.isLoading}
-          onSearch={handleSearch}
-        />
+      <div className="col-start-2 col-end-3 text-center">
+        <header>
+          <h1 className="text-3xl">Pentalog Frontend Challenge</h1>
+          <h2 className="text-2xl text-slate-500">
+            by{' '}
+            <a
+              href="https://requejo.dev"
+              target="_blank"
+              className="underline rounded focus:outline focus:outline-2 focus:outline-offset-2"
+            >
+              Alejandro Requejo
+            </a>
+          </h2>
+        </header>
 
-        {(artistQuery.isLoading ||
-          artistQuery.isError ||
-          (artistQuery.isSuccess && !artistQuery.data)) && (
-          <p>
-            {artistQuery.isLoading
-              ? 'Searching...'
-              : artistQuery.isError
-              ? 'Something went wrong.'
-              : 'No artist found with that name.'}
-          </p>
-        )}
-
-        {artistQuery.isSuccess && artistQuery.data && (
-          <img
-            src={artistQuery.data.cover_image}
-            alt={artistQuery.data.title}
-            className="block mx-auto rounded shadow-2xl"
+        <main className="mt-16 space-y-8">
+          <SearchBar
+            isSearching={artistQuery.isLoading}
+            onSearch={handleSearch}
           />
-        )}
 
-        {!releasesQuery.isIdle && (
-          <Releases releases={releases}>
-            {!(releasesQuery.isSuccess && releases.length > 0) && (
-              <p>
-                {releasesQuery.isLoading
-                  ? 'Fetching releases...'
-                  : releasesQuery.isError
-                  ? 'Something went wrong.'
-                  : 'No releases found for this artist.'}
-              </p>
-            )}
+          {(artistQuery.isLoading ||
+            artistQuery.isError ||
+            (artistQuery.isSuccess && !artistQuery.data)) && (
+            <p>
+              {artistQuery.isLoading
+                ? 'Searching...'
+                : artistQuery.isError
+                ? 'Something went wrong.'
+                : 'No artist found with that name.'}
+            </p>
+          )}
 
-            {releasesQuery.isSuccess &&
-              releasesQuery.data &&
-              releasesQuery.data.pagination.page <
-                releasesQuery.data.pagination.pages && (
-                <button
-                  className="px-4 py-2 bg-black text-white rounded focus:outline focus:outline-2 focus:outline-offset-2"
-                  onClick={() =>
-                    loadReleases(
-                      artistQuery.data!.id,
-                      releasesQuery.data!.pagination.page + 1
-                    )
-                  }
-                >
-                  Load more
-                </button>
+          {artistQuery.isSuccess && artistQuery.data && (
+            <img
+              src={artistQuery.data.cover_image}
+              alt={artistQuery.data.title}
+              className="block mx-auto rounded shadow-2xl"
+            />
+          )}
+
+          {!releasesQuery.isIdle && (
+            <Releases releases={releases}>
+              {!(releasesQuery.isSuccess && releases.length > 0) && (
+                <p>
+                  {releasesQuery.isLoading
+                    ? 'Fetching releases...'
+                    : releasesQuery.isError
+                    ? 'Something went wrong.'
+                    : 'No releases found for this artist.'}
+                </p>
               )}
-          </Releases>
-        )}
+
+              {releasesQuery.isSuccess &&
+                releasesQuery.data &&
+                releasesQuery.data.pagination.page <
+                  releasesQuery.data.pagination.pages && (
+                  <button
+                    className="px-4 py-2 bg-black text-white rounded focus:outline focus:outline-2 focus:outline-offset-2"
+                    onClick={() =>
+                      loadReleases(
+                        artistQuery.data!.id,
+                        releasesQuery.data!.pagination.page + 1
+                      )
+                    }
+                  >
+                    Load more
+                  </button>
+                )}
+            </Releases>
+          )}
+        </main>
       </div>
     </div>
   );
