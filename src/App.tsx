@@ -1,6 +1,6 @@
 import type { Artist, GetReleasesResponse, Release } from './types/discogs';
 import React from 'react';
-import { SearchBar } from './components';
+import { Releases, SearchBar } from './components';
 import { getReleases, search } from './services/api';
 import { useAsync } from './hooks';
 
@@ -79,36 +79,23 @@ export default function App() {
           </div>
         )}
 
-        {/* Releases */}
-        {!releasesQuery.isIdle && releases.length === 0 && (
-          <p className="text-center mt-4">
-            {releasesQuery.isLoading
-              ? 'Fetching latest releases...'
-              : releasesQuery.isError
-              ? 'Something went wrong'
-              : releasesQuery.isSuccess && releases.length === 0
-              ? 'No releases found for this artist.'
-              : null}
-          </p>
-        )}
+        {!releasesQuery.isIdle && (
+          <Releases releases={releases}>
+            <div className="text-center mt-4">
+              <p>
+                {releasesQuery.isLoading
+                  ? 'Fetching releases...'
+                  : releasesQuery.isError
+                  ? 'Something went wrong.'
+                  : releasesQuery.isSuccess && releases.length === 0
+                  ? 'No releases found for this artist.'
+                  : null}
+              </p>
 
-        {releases.length > 0 && (
-          <>
-            <div className="grid grid-cols-5 gap-4" data-testid="releases">
-              {releases.map((release) => (
-                <div
-                  key={release.id}
-                  className="aspect-square flex items-center justify-center"
-                  data-testid="release"
-                >
-                  <img src={release.thumb} alt={release.title} />
-                </div>
-              ))}
-            </div>
-            {releasesQuery.data &&
-              releasesQuery.data.pagination.page <
-                releasesQuery.data.pagination.pages && (
-                <div className="text-center">
+              {releasesQuery.isSuccess &&
+                releasesQuery.data &&
+                releasesQuery.data.pagination.page <
+                  releasesQuery.data.pagination.pages && (
                   <button
                     className="px-4 py-2 bg-black text-white rounded"
                     onClick={() =>
@@ -120,9 +107,9 @@ export default function App() {
                   >
                     Load more
                   </button>
-                </div>
-              )}
-          </>
+                )}
+            </div>
+          </Releases>
         )}
       </div>
     </div>

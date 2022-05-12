@@ -58,7 +58,7 @@ describe('<App />', () => {
 
     // Check initial set of releases
     const releases = await screen.findByTestId('releases');
-    expect(within(releases).getAllByRole('img')).toHaveLength(5);
+    expect(await within(releases).findAllByRole('img')).toHaveLength(5);
 
     server.use(
       rest.get(
